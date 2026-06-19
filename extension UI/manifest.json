@@ -4,16 +4,18 @@
   "version": "1.0.0",
   "description": "Generates crucial perspective",
   "icons": {
-    "16": "World Lens Logo.png"
+    "16": "World Lens Logo 2.png"
   },
   "action": {
     "default_icon": {
-      "16": "World Lens Logo.png",
-      "24": "World Lens Logo.png",
-      "32": "World Lens Logo.png"
+      "16": "World Lens Logo 2.png",
+      "24": "World Lens Logo 2.png",
+      "32": "World Lens Logo 2.png"
     },
-    "default_title": "World Lens Title",
-    "default_popup": "popup.html"
+    "default_title": "World Lens Title"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
   },
   "permissions": ["storage", "sidePanel"],
   "background": {

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "World Lens",
+  "version": "1.0.0",
+  "description": "Generates crucial perspective",
+  "icons": {
+    "16": "World Lens Logo.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "World Lens Logo.png",
+      "24": "World Lens Logo.png",
+      "32": "World Lens Logo.png"
+    },
+    "default_title": "World Lens Title",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["storage", "sidePanel"],
+  "background": {
+    "service_worker": "background.js"
+  }
+}

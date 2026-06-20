@@ -13,3 +13,7 @@ h1 {
   font-weight: bold;
   font-family: "Syne", sans-serif, Arial, Helvetica;
 }
+
+p {
+  color: white;
+}

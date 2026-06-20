@@ -15,9 +15,9 @@
     "default_title": "World Lens Title"
   },
   "side_panel": {
-    "default_path": "popup.html"
+    "default_path": "sidepanel.html"
   },
-  "permissions": ["storage", "sidePanel"],
+  "permissions": ["storage", "sidePanel", "activeTab"],
   "background": {
     "service_worker": "background.js"
   }

@@ -1,3 +1,7 @@
+/*            *
+ * SIDE PANEL *
+ *            */
+
 // Undo the previously-persisted "open panel on action click" behavior.
 // While that's true, Chrome auto-opens the panel and SUPPRESSES onClicked,
 // so we never get the activeTab grant. Forcing it false makes onClicked fire.
@@ -22,6 +26,10 @@ chrome.action.onClicked.addListener((tab) => {
     path: "sidepanel.html",
     enabled: true,
   });
+
+  /*          *
+   * SAVE URL *
+   *          */
 
   // IMPORTANT: open() must be called synchronously within the user gesture.
   // Do NOT await anything before this line, or the open will be rejected.

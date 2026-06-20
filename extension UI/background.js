@@ -31,10 +31,6 @@ chrome.action.onClicked.addListener((tab) => {
    * SAVE URL *
    *          */
 
-  // IMPORTANT: open() must be called synchronously within the user gesture.
-  // Do NOT await anything before this line, or the open will be rejected.
-  chrome.sidePanel.open({ tabId: tab.id });
-
   // activeTab is granted on click, so tab.url is populated. Store it for the panel.
   const result = tab.url
     ? tab.url
@@ -43,5 +39,11 @@ chrome.action.onClicked.addListener((tab) => {
   console.log("[BACKGROUND] tab.url =", tab.url);
   console.log("[BACKGROUND] full tab =", tab);
 
-  chrome.storage.local.set({ pageUrl: result });
+  chrome.storage.local.set({ pageUrl: result }, () => {
+    console.log("[BACKGROUND] saved pageUrl =", result);
+  });
+
+  // IMPORTANT: open() must be called synchronously within the user gesture.
+  // Do NOT await anything before this line, or the open will be rejected.
+  chrome.sidePanel.open({ tabId: tab.id });
 });

@@ -35,10 +35,15 @@ chrome.action.onClicked.addListener((tab) => {
   const result = tab.url
     ? tab.url
     : "NO_URL — restricted page or no activeTab grant";
+  // let result;
+  // if (tab.url) {
+  //   result = tab.url; } else {on chrome website and new tabs}
 
+  //prints to service worker console for debugging
   console.log("[BACKGROUND] tab.url =", tab.url);
   console.log("[BACKGROUND] full tab =", tab);
 
+  //saves result to pageUrl key in local storage
   chrome.storage.local.set({ pageUrl: result }, () => {
     console.log("[BACKGROUND] saved pageUrl =", result);
   });

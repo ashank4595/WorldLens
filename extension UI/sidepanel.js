@@ -1,17 +1,15 @@
-function showUrl(pageUrl) {
-  const el = document.getElementById("url");
+const urlElement = document.getElementById("url"); //get elem from sidepanel.html
 
-  if (el) {
-    el.textContent = pageUrl ?? "undefined (nothing in storage yet)";
-  }
+function updateUrlElement() {
+  chrome.storage.local.get(["pageUrl"], (res) => {
+    const pageUrl = res.pageUrl ?? "undefined (nothing in storage yet)";
 
-  console.log("[PANEL] pageUrl =", pageUrl);
+    urlElement.textContent = pageUrl;
+    console.log("[PANEL] pageUrl =", pageUrl);
+  });
 }
 
-// Read URL saved by background.js when panel loads.
-chrome.storage.local.get(["pageUrl"], ({ pageUrl }) => {
-  showUrl(pageUrl);
-});
+updateUrlElement();
 
 // Update the panel when background.js saves a new URL.
 chrome.storage.onChanged.addListener((changes, area) => {

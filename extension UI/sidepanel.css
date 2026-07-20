@@ -3,7 +3,7 @@
 
 body {
   width: 100%;
-  margin: 20px;
+  margin: 10px;
   background-color: rgb(0, 0, 0);
 }
 
@@ -11,9 +11,14 @@ h1 {
   color: #97c7f2;
   letter-spacing: 3px;
   font-weight: bold;
-  font-family: "Syne", sans-serif, Arial, Helvetica;
+  font-family: sans-serif, Arial, Helvetica;
 }
 
 p {
   color: white;
+}
+
+h2 {
+  color: white;
+  font-size: 18px;
 }

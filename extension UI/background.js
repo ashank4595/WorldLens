@@ -36,7 +36,7 @@ chrome.action.onClicked.addListener((tab) => {
   });
 
   /* SAVE PAGE URL *
-   * AND TITLE     *
+   * , TITLE,     *
    * TO LOCAL      */
   const pageUrl = tab.url
     ? tab.url
@@ -60,10 +60,33 @@ chrome.action.onClicked.addListener((tab) => {
     {
       pageUrl,
       pageTitle,
+      pageText: "Extracting page text...",
     },
     () => {
       console.log("[BACKGROUND] saved pageUrl =", pageUrl);
       console.log("[BACKGROUND] saved pageTitle =", pageTitle);
+      console.log("[BACKGROUND] reset pageText");
+    },
+  );
+  // Injects contentScript.js inside the clicked webpage.
+  chrome.scripting.executeScript(
+    {
+      target: { tabId: tab.id },
+      files: ["contentScript.js"],
+    },
+    () => {
+      if (chrome.runtime.lastError) {
+        console.log(
+          "[BACKGROUND] content script injection failed:",
+          chrome.runtime.lastError.message,
+        );
+
+        chrome.storage.local.set({
+          pageText: "Could not extract text from this page.",
+        });
+      } else {
+        console.log("[BACKGROUND] contentScript.js injected");
+      }
     },
   );
 

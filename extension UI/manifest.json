@@ -17,7 +17,7 @@
   "side_panel": {
     "default_path": "sidepanel.html"
   },
-  "permissions": ["storage", "sidePanel", "activeTab"],
+  "permissions": ["storage", "sidePanel", "activeTab", "scripting"],
   "background": {
     "service_worker": "background.js"
   }

@@ -18,17 +18,6 @@ function updateUrlElement() {
 
 updateUrlElement();
 
-// Update the panel when background.js saves a new pageURL
-// ie. new website and extension clicked again, this ensures url displayed updates
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.pageUrl) {
-    const pageUrl = changes.pageUrl.newValue;
-
-    urlElement.textContent = pageUrl;
-    console.log("[PANEL] pageUrl =", pageUrl);
-  }
-});
-
 /*              *
  * DISPLAY TITLE*
  *              */
@@ -44,14 +33,51 @@ function updateTitleElement() {
   });
 }
 
+/*                  *
+ * DISPLAY PAGE TEXT*
+ *                  */
+
+const pageTextElement = document.getElementById("page-text");
+
+function updatePageTextElement() {
+  chrome.storage.local.get(["pageText"], (res) => {
+    const pageText = res.pageText ?? "No page text extracted yet.";
+
+    pageTextElement.textContent = pageText;
+    console.log("[PANEL] pageText length =", pageText.length);
+  });
+}
+
+updatePageTextElement();
+
 updateTitleElement();
 
-// Update the panel when background.js saves a new pageTitle
+/*                          *
+ * LISTEN FOR STORAGE UPDATE*
+ *                          */
+
 chrome.storage.onChanged.addListener((changes, area) => {
+  // Update sidepanel when background.js saves a new pageURL
+  // ie. new website and extension clicked again, this ensures url displayed updates
+  if (area === "local" && changes.pageUrl) {
+    const pageUrl = changes.pageUrl.newValue;
+
+    urlElement.textContent = pageUrl;
+    console.log("[PANEL] pageUrl =", pageUrl);
+  }
+
+  // Update sidepanel when background.js saves a new pageTitle
   if (area === "local" && changes.pageTitle) {
     const pageTitle = changes.pageTitle.newValue;
 
     titleElement.textContent = pageTitle;
     console.log("[PANEL] pageTitle =", pageTitle);
+  }
+
+  // Update sidepanel when background.js saves a new pageText
+  if (changes.pageText) {
+    const pageText = changes.pageText.newValue;
+    pageTextElement.textContent = pageText;
+    console.log("[PANEL] pageText length =", pageText.length);
   }
 });

@@ -43,7 +43,7 @@ function updatePageTextElement() {
   chrome.storage.local.get(["pageText"], (res) => {
     const pageText = res.pageText ?? "No page text extracted yet.";
 
-    pageTextElement.textContent = pageText;
+    pageTextElement.textContent = pageText.slice(0, 3000);
     console.log("[PANEL] pageText length =", pageText.length);
   });
 }
@@ -75,9 +75,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
   }
 
   // Update sidepanel when background.js saves a new pageText
-  if (changes.pageText) {
+  if (area === "local" && changes.pageText) {
     const pageText = changes.pageText.newValue;
-    pageTextElement.textContent = pageText;
+    // First 3000 characters of pageText
+    pageTextElement.textContent = pageText.slice(0, 3000);
     console.log("[PANEL] pageText length =", pageText.length);
   }
 });

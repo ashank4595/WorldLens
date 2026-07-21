@@ -95,3 +95,24 @@ chrome.action.onClicked.addListener((tab) => {
   // Do NOT await anything before this line, or the open will be rejected.
   chrome.sidePanel.open({ tabId: tab.id });
 });
+
+/*                         *
+ * RECEIVE PAGE TEXT       *
+ * FROM CONTENT SCRIPT     *
+ * SAVE TO LOCAL           */
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "PAGE_TEXT_EXTRACTED") {
+    chrome.storage.local.set(
+      {
+        pageText: message.pageText,
+      },
+      () => {
+        console.log(
+          "[BACKGROUND] saved pageText length =",
+          message.pageText.length,
+        );
+      },
+    );
+  }
+});

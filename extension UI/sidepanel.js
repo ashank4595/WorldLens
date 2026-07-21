@@ -16,8 +16,6 @@ function updateUrlElement() {
   });
 }
 
-updateUrlElement();
-
 /*              *
  * DISPLAY TITLE*
  *              */
@@ -48,8 +46,6 @@ function updateHeadlineElement() {
   });
 }
 
-updateHeadlineElement();
-
 /*                  *
  * DISPLAY PAGE TEXT*
  *                  */
@@ -65,10 +61,10 @@ function updatePageTextElement() {
   });
 }
 
-updatePageTextElement();
-
+updateUrlElement();
 updateTitleElement();
-
+updateHeadlineElement();
+updatePageTextElement();
 /*                          *
  * LISTEN FOR STORAGE UPDATE*
  *                          */
@@ -113,16 +109,30 @@ chrome.storage.onChanged.addListener((changes, area) => {
  *                       */
 
 const launchEngineButton = document.getElementById("launch-engine-btn");
+const globalResultsElement = document.getElementById("global-results");
+
+console.log("[PANEL] launchEngineButton =", launchEngineButton);
+console.log("[PANEL] globalResultsElement =", globalResultsElement);
 
 launchEngineButton.addEventListener("click", () => {
-  chrome.storage.local.get(
-    ["pageUrl", "pageTitle", "pageHeadline", "pageText"],
-    (res) => {
-      console.log("[PANEL] Launch Engine clicked");
-      console.log("[PANEL] pageUrl =", res.pageUrl);
-      console.log("[PANEL] pageTitle =", res.pageTitle);
-      console.log("[PANEL] pageHeadline =", res.pageHeadline);
-      console.log("[PANEL] pageText length =", res.pageText?.length);
-    },
-  );
+  console.log("[PANEL] Launch Engine clicked");
+
+  globalResultsElement.innerHTML = `
+  <h3>Global Coverage</h3>
+
+  <div class="country-card">
+    <strong>🇮🇳 India</strong>
+    <p>3 related articles found</p>
+  </div>
+
+  <div class="country-card">
+    <strong>🇯🇵 Japan</strong>
+    <p>2 related articles found</p>
+  </div>
+
+  <div class="country-card">
+    <strong>🇩🇪 Germany</strong>
+    <p>1 related article found</p>
+  </div>
+`;
 });

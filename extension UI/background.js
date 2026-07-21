@@ -60,12 +60,13 @@ chrome.action.onClicked.addListener((tab) => {
     {
       pageUrl,
       pageTitle,
+      pageHeadline: "Extracting headline...",
       pageText: "Extracting page text...",
     },
     () => {
       console.log("[BACKGROUND] saved pageUrl =", pageUrl);
       console.log("[BACKGROUND] saved pageTitle =", pageTitle);
-      console.log("[BACKGROUND] reset pageText");
+      console.log("[BACKGROUND] reset pageHeadline and pageText");
     },
   );
   // Injects contentScript.js inside the clicked webpage.
@@ -83,6 +84,7 @@ chrome.action.onClicked.addListener((tab) => {
 
         chrome.storage.local.set({
           pageText: "Could not extract text from this page.",
+          pageHeadline: "Could not extract headline from this page.",
         });
       } else {
         console.log("[BACKGROUND] contentScript.js injected");
@@ -97,17 +99,19 @@ chrome.action.onClicked.addListener((tab) => {
 });
 
 /*                         *
- * RECEIVE PAGE TEXT       *
+ * RECEIVE PAGE CONTENT    *
  * FROM CONTENT SCRIPT     *
  * SAVE TO LOCAL           */
 
 chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === "PAGE_TEXT_EXTRACTED") {
+  if (message.type === "PAGE_CONTENT_EXTRACTED") {
     chrome.storage.local.set(
       {
+        pageHeadline: message.pageHeadline,
         pageText: message.pageText,
       },
       () => {
+        console.log("[BACKGROUND] saved pageHeadline =", message.pageHeadline);
         console.log(
           "[BACKGROUND] saved pageText length =",
           message.pageText.length,

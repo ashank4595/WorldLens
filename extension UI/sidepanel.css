@@ -1,14 +1,21 @@
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap");
 /* for syne font */
 
+* {
+  box-sizing: border-box;
+}
+
 body {
-  width: 100%;
-  margin: 10px;
+  margin: 0;
+  padding: 10px;
   background-color: rgb(0, 0, 0);
+  position: relative;
+  overflow-x: hidden;
 }
 
 h1 {
-  color: #97c7f2;
+  /* color: #97c7f2; */
+  color: #6cbaff;
   letter-spacing: 3px;
   font-weight: bold;
   font-family: sans-serif, Arial, Helvetica;
@@ -25,4 +32,80 @@ h2 {
 
 pre {
   color: white;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#url {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#launch-engine-btn {
+  position: relative;
+  display: block;
+  width: calc(100% - 8px);
+  max-width: 100%;
+  padding: 13px 18px;
+  margin: 14px 4px;
+
+  border: 1px solid rgba(80, 255, 180, 0.7);
+  border-radius: 14px;
+
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      rgba(170, 255, 220, 0.35),
+      transparent 28%
+    ),
+    linear-gradient(135deg, #031f18, #075c43 45%, #10d88c);
+
+  color: #eafff6;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 0 8px rgba(24, 255, 160, 0.3),
+    0 0 18px rgba(24, 255, 160, 0.15),
+    inset 0 0 10px rgba(255, 255, 255, 0.09);
+}
+
+#launch-engine-btn::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+
+  border-radius: 18px;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 255, 170, 0.05),
+    rgba(120, 255, 210, 0.35),
+    rgba(0, 255, 170, 0.05)
+  );
+
+  filter: blur(8px);
+  opacity: 0.45;
+}
+
+#launch-engine-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(180, 255, 225, 0.95);
+
+  box-shadow:
+    0 0 16px rgba(24, 255, 160, 0.65),
+    0 0 36px rgba(24, 255, 160, 0.35),
+    inset 0 0 18px rgba(255, 255, 255, 0.16);
+}
+
+#launch-engine-btn:hover::before {
+  opacity: 0.8;
+}
+
+#launch-engine-btn:active {
+  transform: translateY(1px) scale(0.99);
 }

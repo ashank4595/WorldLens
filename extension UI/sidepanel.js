@@ -34,6 +34,23 @@ function updateTitleElement() {
 }
 
 /*                  *
+ * DISPLAY HEADLINE *
+ *                  */
+
+const headlineElement = document.getElementById("headline");
+
+function updateHeadlineElement() {
+  chrome.storage.local.get(["pageHeadline"], (res) => {
+    const pageHeadline = res.pageHeadline ?? "No headline extracted yet.";
+
+    headlineElement.textContent = pageHeadline;
+    console.log("[PANEL] pageHeadline =", pageHeadline);
+  });
+}
+
+updateHeadlineElement();
+
+/*                  *
  * DISPLAY PAGE TEXT*
  *                  */
 
@@ -81,4 +98,31 @@ chrome.storage.onChanged.addListener((changes, area) => {
     pageTextElement.textContent = pageText.slice(0, 3000);
     console.log("[PANEL] pageText length =", pageText.length);
   }
+
+  // Update sidepanel when background.js saves a new pageHeadline
+  if (area === "local" && changes.pageHeadline) {
+    const pageHeadline = changes.pageHeadline.newValue;
+
+    headlineElement.textContent = pageHeadline;
+    console.log("[PANEL] pageHeadline =", pageHeadline);
+  }
+});
+
+/*                       *
+ * LAUNCH ENGINE BUTTON  *
+ *                       */
+
+const launchEngineButton = document.getElementById("launch-engine-btn");
+
+launchEngineButton.addEventListener("click", () => {
+  chrome.storage.local.get(
+    ["pageUrl", "pageTitle", "pageHeadline", "pageText"],
+    (res) => {
+      console.log("[PANEL] Launch Engine clicked");
+      console.log("[PANEL] pageUrl =", res.pageUrl);
+      console.log("[PANEL] pageTitle =", res.pageTitle);
+      console.log("[PANEL] pageHeadline =", res.pageHeadline);
+      console.log("[PANEL] pageText length =", res.pageText?.length);
+    },
+  );
 });

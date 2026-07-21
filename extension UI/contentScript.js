@@ -1,35 +1,28 @@
-// /*                 *
-//  * EXTRACT WEBPAGE *
-//  * TEXT            *
-//  *                 */
-
-// (() => {
-//   const articleElement =
-//     document.querySelector("article") ||
-//     document.querySelector("main") ||
-//     document.querySelector('[role="main"]') ||
-//     document.body;
-
-//   const pageText = articleElement.innerText || "";
-
-//   console.log("[CONTENT] pageText length =", pageText.length);
-
-//   chrome.runtime.sendMessage({
-//     type: "PAGE_TEXT_EXTRACTED",
-//     pageText,
-//   });
-// })();
-
 /*                 *
  * EXTRACT WEBPAGE *
- * TEXT            *
+ * TEXT + HEADLINE *
  *                 */
 
-const pageText = document.body.innerText || "";
+(() => {
+  const headlineElement = document.querySelector("h1");
 
-console.log("[CONTENT] extracted pageText length =", pageText.length);
+  const pageHeadline =
+    headlineElement?.innerText || document.title || "NO_HEADLINE";
 
-chrome.runtime.sendMessage({
-  type: "PAGE_TEXT_EXTRACTED",
-  pageText,
-});
+  const articleElement =
+    document.querySelector("article") ||
+    document.querySelector("main") ||
+    document.querySelector('[role="main"]') ||
+    document.body;
+
+  const pageText = articleElement.innerText || "";
+
+  console.log("[CONTENT] pageHeadline =", pageHeadline);
+  console.log("[CONTENT] pageText length =", pageText.length);
+
+  chrome.runtime.sendMessage({
+    type: "PAGE_CONTENT_EXTRACTED",
+    pageHeadline,
+    pageText,
+  });
+})();

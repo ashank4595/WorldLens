@@ -107,68 +107,68 @@ chrome.storage.onChanged.addListener((changes, area) => {
 /*                       *
  * LAUNCH ENGINE BUTTON  *
  *                       */
-
+// Launch Engine clicked
+// → sidepanel creates requestBody
+// → sidepanel POSTs requestBody to FastAPI
+// → FastAPI receives request as Python dict
+// → FastAPI returns fake article JSON
+// → sidepanel receives JSON as data
+// → sidepanel maps data.articles into cards
 function setupLaunchEngineButton() {
   const button = document.getElementById("launch-engine-btn");
   const results = document.getElementById("global-results");
 
-  const fakeResults = [
-    {
-      country: "🇮🇳 India",
-      count: 3,
-    },
-    {
-      country: "🇯🇵 Japan",
-      count: 2,
-    },
-    {
-      country: "🇩🇪 Germany",
-      count: 1,
-    },
-  ];
-  /* When button is clicked:
-  1. Read ["pageUrl", "pageTitle", "pageHeadline", "pageText"] from local storage
-  2. Create searchQuery string and requestBody object for the future backend API
-  3. Log requestBody for debugging
-  4. Display mock result cards*/
   button.addEventListener("click", () => {
     console.log("[PANEL] Launch Engine clicked");
 
+    // Read the extracted page data saved by background.js
     chrome.storage.local.get(
       ["pageUrl", "pageTitle", "pageHeadline", "pageText"],
-      (res) => {
+      async (res) => {
         const pageUrl = res.pageUrl ?? "";
         const pageTitle = res.pageTitle ?? "";
         const pageHeadline = res.pageHeadline ?? "";
         const pageText = res.pageText ?? "";
 
-        const searchQuery = pageHeadline || pageTitle || pageUrl;
-
+        // Create the request object that will be sent to FastAPI.
+        // searchQuery prioritizes the real article headline, then browser title, then URL.
         const requestBody = {
           pageUrl,
           pageTitle,
           pageHeadline,
-          searchQuery,
+          searchQuery: pageHeadline || pageTitle || pageUrl,
           pageTextPreview: pageText.slice(0, 1000),
         };
 
         console.log("[PANEL] API requestBody =", requestBody);
 
-        const cardsHtml = fakeResults
-          .map((result) => {
-            return `
-              <div class="country-card">
-                <strong>${result.country}</strong>
-                <p>${result.count} related articles found</p>
-              </div>
-            `;
-          })
-          .join("");
+        // Send the requestBody object to the FastAPI backend
+        const response = await fetch("http://127.0.0.1:3000/api/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody), //Convert requestBody object to a JSON
+        });
+
+        // Store backend response in data after converting
+        // from a python dict to a JSON
+        const data = await response.json();
+        console.log("[PANEL] backend response =", data);
 
         results.innerHTML = `
-          <h3>Global Coverage</h3>
-          ${cardsHtml}
-        `;
+        <h3>Global Coverage</h3>
+        ${data.articles
+          .map(
+            (article) => `
+              <div class="country-card">
+                <strong>${article.country}</strong>
+                <p>${article.source}</p>
+                <p>${article.title}</p>
+                <a href="${article.url}" target="_blank">Open article</a>
+              </div>
+            `,
+          )
+          .join("")}
+      `;
       },
     );
   });

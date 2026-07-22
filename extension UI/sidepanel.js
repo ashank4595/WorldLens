@@ -108,31 +108,70 @@ chrome.storage.onChanged.addListener((changes, area) => {
  * LAUNCH ENGINE BUTTON  *
  *                       */
 
-const launchEngineButton = document.getElementById("launch-engine-btn");
-const globalResultsElement = document.getElementById("global-results");
+function setupLaunchEngineButton() {
+  const button = document.getElementById("launch-engine-btn");
+  const results = document.getElementById("global-results");
 
-console.log("[PANEL] launchEngineButton =", launchEngineButton);
-console.log("[PANEL] globalResultsElement =", globalResultsElement);
+  const fakeResults = [
+    {
+      country: "🇮🇳 India",
+      count: 3,
+    },
+    {
+      country: "🇯🇵 Japan",
+      count: 2,
+    },
+    {
+      country: "🇩🇪 Germany",
+      count: 1,
+    },
+  ];
+  /* When button is clicked:
+  1. Read ["pageUrl", "pageTitle", "pageHeadline", "pageText"] from local storage
+  2. Create searchQuery string and requestBody object for the future backend API
+  3. Log requestBody for debugging
+  4. Display mock result cards*/
+  button.addEventListener("click", () => {
+    console.log("[PANEL] Launch Engine clicked");
 
-launchEngineButton.addEventListener("click", () => {
-  console.log("[PANEL] Launch Engine clicked");
+    chrome.storage.local.get(
+      ["pageUrl", "pageTitle", "pageHeadline", "pageText"],
+      (res) => {
+        const pageUrl = res.pageUrl ?? "";
+        const pageTitle = res.pageTitle ?? "";
+        const pageHeadline = res.pageHeadline ?? "";
+        const pageText = res.pageText ?? "";
 
-  globalResultsElement.innerHTML = `
-  <h3>Global Coverage</h3>
+        const searchQuery = pageHeadline || pageTitle || pageUrl;
 
-  <div class="country-card">
-    <strong>🇮🇳 India</strong>
-    <p>3 related articles found</p>
-  </div>
+        const requestBody = {
+          pageUrl,
+          pageTitle,
+          pageHeadline,
+          searchQuery,
+          pageTextPreview: pageText.slice(0, 1000),
+        };
 
-  <div class="country-card">
-    <strong>🇯🇵 Japan</strong>
-    <p>2 related articles found</p>
-  </div>
+        console.log("[PANEL] API requestBody =", requestBody);
 
-  <div class="country-card">
-    <strong>🇩🇪 Germany</strong>
-    <p>1 related article found</p>
-  </div>
-`;
-});
+        const cardsHtml = fakeResults
+          .map((result) => {
+            return `
+              <div class="country-card">
+                <strong>${result.country}</strong>
+                <p>${result.count} related articles found</p>
+              </div>
+            `;
+          })
+          .join("");
+
+        results.innerHTML = `
+          <h3>Global Coverage</h3>
+          ${cardsHtml}
+        `;
+      },
+    );
+  });
+}
+
+setupLaunchEngineButton();

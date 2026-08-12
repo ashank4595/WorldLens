@@ -1,0 +1,29 @@
+Example of Data: Response Object returned by GNews, converted to python dict
+
+data = {
+    "totalArticles": 2,
+    "articles": [
+        {
+            "title": "Air India flight investigated after sudden altitude loss",
+            "description": "Authorities are investigating...",
+            "url": "https://example.com/article1",
+            "publishedAt": "2026-08-12T10:30:00Z",
+            "source": {
+                "name": "Reuters",
+                "url": "https://reuters.com",
+                "country": "us"
+            }
+        },
+        {
+            "title": "Air India incident raises safety questions",
+            "description": "The flight from Phuket...",
+            "url": "https://example.com/article2",
+            "publishedAt": "2026-08-12T11:00:00Z",
+            "source": {
+                "name": "BBC",
+                "url": "https://bbc.com",
+                "country": "gb"
+            }
+        }
+    ]
+}

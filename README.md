@@ -1,6 +1,6 @@
 # World Lens
 
-World Lens is a Chrome extension that helps readers detect bias and build a more constructive perspective on global news.
+World Lens is a Chrome extension that helps readers detect bias and build a constructive perspective on global news.
 
 Instead of reading a story from only one outlet, country, or language, World Lens lets users compare how the same event is covered across the world. It surfaces related articles from international sources, organizes them by country, and highlights how framing, emphasis, and narrative can shift depending on where the story is reported.
 
@@ -12,7 +12,7 @@ World Lens is built around a simple idea:
 
 > Better perspective comes from seeing how the same story looks through different lenses.
 
-The goal is not to tell users what to think. The goal is to help them notice bias, compare viewpoints, and form a more informed understanding of complex events.
+The goal is to help users notice bias, compare viewpoints, and form a more informed understanding of complex events.
 
 ## What World Lens Does
 

@@ -2,6 +2,7 @@
  * EXTRACT WEBPAGE *
  * TEXT + HEADLINE *
  *                 */
+// contentScript.js runs/is injected inside the webpage, it can read and modify the  DOM
 
 (() => {
   const headlineElement = document.querySelector("h1");
@@ -20,6 +21,7 @@
   console.log("[CONTENT] pageHeadline =", pageHeadline);
   console.log("[CONTENT] pageText length =", pageText.length);
 
+  // Sends message listened for in background.js
   chrome.runtime.sendMessage({
     type: "PAGE_CONTENT_EXTRACTED",
     pageHeadline,

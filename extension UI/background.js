@@ -1,3 +1,5 @@
+//Saves
+
 // Side panel appears only on the tab where user clicked World Lens
 // Switch tabs → panel hides
 // Return to original tab → panel comes back
@@ -5,30 +7,31 @@
 // its own URL and results. For now, storage is shared globally, so opening
 // the extension on a new tab overwrites the previous tab's data.
 
-/*            *
- * SIDE PANEL *
- *            */
+/* DISABLE      *
+ * AUTO OPENING *
+ * SIDE PANEL   */
+// This is for hiding panel when switching tabs in onclicked
 
-// Undo the previously-persisted "open panel on action click" behavior.
-// While that's true, Chrome auto-opens the panel and SUPPRESSES onClicked,
-// so we never get the activeTab grant. Forcing it false makes onClicked fire.
+//Do not automatically open the side panel when the extension icon is clicked
+//We open it with the on clicked function and change behaviour
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
 
 // Disable the panel by default for every tab.
 // We will enable it only for the tab where the user clicks the extension.
 chrome.sidePanel.setOptions({ enabled: false });
 
+// Keep the side panel disabled by default after install/reload.
 chrome.runtime.onInstalled.addListener(() => {
   chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: false });
 
-  // Keep the side panel disabled by default after install/reload.
   chrome.sidePanel.setOptions({ enabled: false });
 });
 
-//ON CLICKED FUNCTION
+//ON CLICKED FUNCTION, RUNS WHEN EXTENSION ICON IS CLICKED
+//chrome returns tab object containing id, url, title
 chrome.action.onClicked.addListener((tab) => {
+  // Set sidepanel's optiona
   // Enable the panel only for this specific tab.
-  // Other tabs will not have World Lens open.
   chrome.sidePanel.setOptions({
     tabId: tab.id,
     path: "sidepanel.html",
@@ -56,6 +59,8 @@ chrome.action.onClicked.addListener((tab) => {
   console.log("[BACKGROUND] full tab =", tab);
 
   // Saves URL and page title to local storage as pageUrl and pageTitle
+  // contentScript.js executes and later updates pageHeadline and pageText
+  // sidepanel.js reads what is saved to local
   chrome.storage.local.set(
     {
       pageUrl,
@@ -69,7 +74,9 @@ chrome.action.onClicked.addListener((tab) => {
       console.log("[BACKGROUND] reset pageHeadline and pageText");
     },
   );
-  // Injects contentScript.js inside the clicked webpage.
+
+  // Execute contentScript.js inside the tab
+  // Background.js is not so cannot read or write
   chrome.scripting.executeScript(
     {
       target: { tabId: tab.id },
@@ -92,9 +99,7 @@ chrome.action.onClicked.addListener((tab) => {
     },
   );
 
-  // Open side panel when tabId = tab.id.
-  // IMPORTANT: open() must be called synchronously within the user gesture.
-  // Do NOT await anything before this line, or the open will be rejected.
+  // Open side panel
   chrome.sidePanel.open({ tabId: tab.id });
 });
 
@@ -103,6 +108,7 @@ chrome.action.onClicked.addListener((tab) => {
  * FROM CONTENT SCRIPT     *
  * SAVE TO LOCAL           */
 
+//Listens for contentScript.js to send PAGE_CONTENT_EXTRACTED
 chrome.runtime.onMessage.addListener((message) => {
   if (message.type === "PAGE_CONTENT_EXTRACTED") {
     chrome.storage.local.set(

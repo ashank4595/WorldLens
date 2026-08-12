@@ -143,7 +143,7 @@ function setupLaunchEngineButton() {
         console.log("[PANEL] API requestBody =", requestBody);
 
         // Send the requestBody object to the FastAPI backend
-        const response = await fetch("http://127.0.0.1:3000/api/search", {
+        const response = await fetch("http://127.0.0.1:8000/api/search", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(requestBody), //Convert requestBody object to a JSON

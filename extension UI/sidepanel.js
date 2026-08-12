@@ -149,8 +149,7 @@ function setupLaunchEngineButton() {
           body: JSON.stringify(requestBody), //Convert requestBody object to a JSON
         });
 
-        // Store backend response in data after converting
-        // from a python dict to a JSON
+        // Store main.py return in data
         const data = await response.json();
         console.log("[PANEL] backend response =", data);
 

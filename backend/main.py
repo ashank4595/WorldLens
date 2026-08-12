@@ -1,44 +1,3 @@
-# from fastapi import FastAPI
-# from fastapi.middleware.cors import CORSMiddleware
-
-# app = FastAPI()
-
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=["*"],
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
-
-# # Run search() when someone sends POST request to /api/search
-# @app.post("/api/search")
-# async def search(request: dict):
-# #     const requestBody = {                 
-# #       pageUrl: "https://example.com/article",
-# #       pageTitle: "Some browser title",...
-# #     }; Converted to python dict, request
-#     print("[BACKEND] request body =", request)
-
-#     search_query = request.get("searchQuery", "")
-
-#     return {
-#         "searchQueryReceived": search_query,
-#         "articles": [
-#             {
-#                 "title": "Fake backend article from India",
-#                 "source": "HT",
-#                 "url": "https://example.com/india",
-#                 "country": "India",
-#             },
-#             {
-#                 "title": "Fake backend article from Japan",
-#                 "source": "Nikkei",
-#                 "url": "https://example.com/japan",
-#                 "country": "Japan",
-#             },
-#         ],
-#     }
-
 from fastapi import FastAPI
 
 # CORS allows the extension to make requests to the backend which has different origin
@@ -56,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+COUNTRIES = ["us", "in", "hk", "au"]  
 
 # Hashset with words not useful for requests
 STOP_WORDS = {
@@ -102,52 +63,59 @@ async def search(request: dict):
     api_key = os.getenv("GNEWS_API_KEY") # Read API key from terminal
     print("[BACKEND] api key exists =", bool(api_key))
 
-    # settings sent to GNews
-    params = {
-        "q": short_query,
-        "max": 10,
-        "in": "title,description",
-        "sortby": "relevance",
-        "apikey": api_key,
-    }
-
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            response = await client.get(
-                "https://gnews.io/api/v4/search",
-                params=params
-            )
-            
-            # GNews response contains totalArticles and articles[] which in turn contains
-            # sources containing country
-            response.raise_for_status() # Checks for HTTP errors
-            data = response.json() # Converts GNews JSON into a Python dictionary
-
-    except Exception as error:
-        print("[BACKEND] GNews error =", error)
-
-        return {
-            "searchQueryReceived": search_query,
-            "articles": []
+    data = {}
+    for country in COUNTRIES:
+        # Query Parameters
+        params = {
+            "q": short_query,
+            "max": 3,
+            "in": "title,description", # to choose in which attributes keywords are searched
+            "sortby": "relevance",
+            "country": country,
+            "apikey": api_key,
         }
 
-    # STEP 4: Convert GNews format into our frontend format
-    articles = []
+        try:
+            # httpx creates a request
+            # Ex. https://gnews.io/api/v4/search?q=Air+India+Phuket&max=10&apikey=...
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(
+                    "https://gnews.io/api/v4/search",
+                    params=params
+                )
 
-    for article in data.get("articles", []):
+                # GNews response contains totalArticles and articles[] which in turn contains
+                # sources containing country
+                response.raise_for_status() # Checks for HTTP errors
+                curr_data = response.json() # Converts GNews JSON into a Python dictionary
+                data[country] = curr_data 
 
-        source = article.get("source", {})
+        except Exception as error:
+            print("[BACKEND] GNews error =", error)
 
-        articles.append({
-            "title": article.get("title", ""),
-            "source": source.get("name", "Unknown"),
-            "url": article.get("url", ""),
-            "country": source.get("country", "Unknown"),
-        })
+            return {
+                "searchQueryReceived": search_query,
+                "articles": []
+            }
+
+        # STEP 4: Convert GNews format into our frontend format
+        articles = []
+
+        for country in data:
+            for article in data[country].get("articles", []):
+                source = article.get("source", {})
+
+                articles.append({
+                    "title": article.get("title", ""),
+                    "source": source.get("name", "Unknown"),
+                    "url": article.get("url", ""),
+                    "country": country,
+                })
 
     print("[BACKEND] articles =", articles)
 
-    # Returns results to sidepanel.js
+    # Returns search query and article list to sidepanel.js
+    # Each element of article is a dict with title, source, url and country keys
     return {
         "searchQueryReceived": search_query,
         "articles": articles

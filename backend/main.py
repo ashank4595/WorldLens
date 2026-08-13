@@ -18,7 +18,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-COUNTRIES = ["us", "in", "au", "uk"]  
+COUNTRIES = ["tr", "pk", "us", "il", "eg", "in", "gb"]
 
 # Endpoint called by sidepanel.js, request is dict with pageUrl, searchQuery/headline etc.
 @app.post("/api/search") 
@@ -29,7 +29,7 @@ async def search(request: dict):
     # Get headline from frontend
     search_query = request.get("searchQuery", "")
 
-    final_query = build_query(search_query)
+    final_query, keywords = build_query(search_query)
 
     print("[BACKEND] headline =", search_query)
     print("[BACKEND] final query =", final_query)
@@ -44,7 +44,7 @@ async def search(request: dict):
         # Query Parameters
         params = {
             "q": final_query,
-            "max": 10,
+            "max": 20,
             "in": "title,description", # to choose in which attributes keywords are searched
             "sortby": "relevance",
             "country": country,
@@ -82,11 +82,27 @@ async def search(request: dict):
         for article in data[country].get("articles", []):
             source = article.get("source", {})
 
+            # Do not append any_articles that have less than 3 query keywords
+            article_text = (
+                article.get("title", "")
+                + " "
+                + article.get("description", "")
+            ).lower()
+
+            match_count = 0
+
+            for keyword in keywords:
+                if keyword.lower() in article_text:
+                    match_count += 1
+
+            if match_count < 2:
+                continue
+
             articles.append({
                 "title": article.get("title", ""),
                 "source": source.get("name", "Unknown"),
                 "url": article.get("url", ""),
-                "country": country,
+                "country": source.get("country", "Unknown"),
             })
 
     print("[BACKEND] articles =", articles)

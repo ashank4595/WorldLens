@@ -70,12 +70,9 @@ async def search(request: dict):
         except Exception as error:
             print("[BACKEND] GNews error =", error)
 
-            return {
-                "searchQueryReceived": search_query,
-                "articles": []
-            }
+            continue
 
-    # Convert GNews format into our frontend format
+    # Convert GNews format into frontend format
     articles = []
 
     for country in data:

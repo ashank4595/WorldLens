@@ -1,4 +1,3 @@
-# compare_query.py — Mecca pact (~Aug 7, so inside the servable 12h-30d window).
 import os, httpx
 from datetime import datetime, timedelta, timezone
 

@@ -161,7 +161,7 @@ function setupLaunchEngineButton() {
               <div class="country-card">
                 <strong>${article.country}</strong>
                 <p>${article.source}</p>
-                <p>${article.title}</p>
+                <p>${article.title_en || article.title}</p>
                 <a href="${article.url}" target="_blank">Open article</a>
               </div>
             `,

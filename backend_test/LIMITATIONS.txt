@@ -1,0 +1,59 @@
+WORLD LENS — QUERY GENERATION: CURRENT STATE & LIMITATIONS (V1)
+================================================================
+
+APPROACH: Extract entities from headline + body, merge adjacent capitalized
+words into whole entities, AND the top two. Show the query; user can edit it.
+
+--------------------------------------------------------------------
+HEADLINE TESTED: "Analysis: ... Ankara's ... Decades-Old Conflict"
+                 (Turkey PKK peace law, title-case, no actors in headline)
+RESULTS: 10 relevant articles across 6 countries (us, sg, fr, gb, in);
+         entities correctly pulled from body ("PKK", "Turkey").
+CONCLUSION: On a hard case (title-case + rhetorical headline), the
+            title-case guard + body extraction worked. STRONG.
+
+HEADLINE TESTED: "Which country is the new Mecca defense pact targeting?"
+RESULTS: 28 relevant articles; entities ["Mecca", "Saudi Arabia"].
+CONCLUSION: Rhetorical headline naming no actors still recovered via body
+            + comma-split fix. STRONG.
+
+HEADLINE TESTED: "Opinion | Pakistan Might Just Have Signed... 'Saudi' Deal"
+RESULTS: entities ["Aug", "IST Opinion Pakistan Might Just Have Signed"];
+         0 relevant articles.
+CONCLUSION: LIMITATION. The body preview began with dateline/byline junk
+            ("Aug ... IST ... Opinion |"), which the extractor merged into a
+            fake entity. Query generation is only as good as the body text
+            fed to it; dirty previews (datelines, repeated title-case
+            headlines, "Opinion|"/"Analysis:" prefixes) break extraction.
+
+--------------------------------------------------------------------
+KNOWN LIMITATIONS (V1)
+1. Dirty body previews produce garbage entities (see above).
+2. Capitalization heuristic fails on ALL-CAPS / lowercase headlines; only
+   sentence-case body is reliable.
+3. Rarity/position ranking can pick a peripheral entity over the central one.
+4. English-only: non-English countries (il, eg, tr) return ~nothing.
+
+MITIGATION: User can edit the shown query before search — the fallback that
+makes an imperfect extractor acceptable for a V1 targeting ~80% no-edit.
+
+--------------------------------------------------------------------
+LANGUAGE SUPPORT — 3 WAYS
+1. Machine-translate the query per country (lang=he/ar/tr) with cheap MT,
+   then translate returned headlines back to English.
+2. Query only English-publishing countries in V1 and label non-English ones
+   "coverage unavailable" rather than showing them empty.
+3. Use a multilingual news API/source so one query matches across languages
+   without per-country translation.
+
+--------------------------------------------------------------------
+CROSS-LINGUAL EXPERIMENT (option 1 built) — FLOW
+Headline+body -> extract English entities -> per country: translate the
+entities into that language, query GNews (lang+country), translate the
+returned headlines back to English -> dedup -> return.
+
+LIMITATIONS (from this experiment)
+- Free Google-web MT is rate-limited and mistransliterates named entities,
+  so translated entity-AND queries sometimes return few or zero articles.
+- Back-translation is lossy, so the English headline can distort the exact
+  framing the tool is meant to compare.

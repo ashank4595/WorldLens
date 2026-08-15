@@ -16,6 +16,12 @@ Design (all conclusions proven during debugging):
 build_query(headline, body="") -> (query_string, entities_list)
 """
 
+# ── CROSS-LINGUAL FLOW (this file = step 1) ───────────────────────
+# >> headline+body → [English entities]   << you are here
+#    → translate entities → country lang   (translator.py)
+#    → GNews query → foreign headlines
+#    → translate headlines back → English  (translator.py)
+
 import re
 
 # Minimal stop/common lists. Kept local to backend_test so this file is
@@ -95,7 +101,13 @@ def extract_entities(text):
             continue
 
         if looks_entity and low not in STOP_WORDS:
-            current.append(w.rstrip(".'’"))
+            # Strip a possessive ('s / 's) so "Turkey's" -> "Turkey". Left in,
+            # the possessive translates as a grammatical construction
+            # ("of Turkey" / "der Türkei") and breaks non-English queries.
+            clean = re.sub(r"['’]s$", "", w)
+            clean = clean.rstrip(".'’")
+            if clean:
+                current.append(clean)
         else:
             flush()
 

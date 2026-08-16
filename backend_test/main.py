@@ -45,12 +45,18 @@ app.add_middleware(
 # because deep-translator and GNews disagree on some (Hebrew especially).
 #   TRANSLATOR_LANG -> passed to deep-translator
 #   GNEWS_LANG      -> passed to GNews `lang` param
-TRANSLATOR_LANG = {"il": "iw", "eg": "ar", "tr": "tr",
-                   "fr": "fr", "de": "de", "ru": "ru"}   # iw = Hebrew for Google
-GNEWS_LANG      = {"il": "he", "eg": "ar", "tr": "tr",
-                   "fr": "fr", "de": "de", "ru": "ru"}   # he = Hebrew for GNews
+# Any country missing from a map falls back to "en" (no crash); add an entry
+# to both maps when you want real translation for that country.
+TRANSLATOR_LANG = {
+    "kp": "ko", "kr": "ko", "us": "en", "jp": "ja", "cn": "zh-CN",
+    "ru": "ru", "au": "en", "gb": "en", "fr": "fr", "de": "de",
+}
+GNEWS_LANG = {
+    "kp": "ko", "kr": "ko", "us": "en", "jp": "ja", "cn": "zh",
+    "ru": "ru", "au": "en", "gb": "en", "fr": "fr", "de": "de",
+}
 
-COUNTRIES = ["il", "eg", "tr", "fr", "de", "ru"]
+COUNTRIES = ["kp", "kr", "us", "jp", "cn", "ru", "au", "gb", "fr", "de"]
 
 REQUEST_DELAY_SECONDS = 1.1
 
@@ -77,8 +83,8 @@ async def search(request: dict):
 
     data = {}
     for i, country in enumerate(COUNTRIES):
-        tlang = TRANSLATOR_LANG[country]   # for deep-translator
-        glang = GNEWS_LANG[country]        # for GNews
+        tlang = TRANSLATOR_LANG.get(country, "en")   # for deep-translator
+        glang = GNEWS_LANG.get(country, "en")        # for GNews
 
         # translate ENTITIES only; operators/quotes stay literal
         country_query = build_translated_query(entities, tlang)
@@ -89,7 +95,7 @@ async def search(request: dict):
             "q": country_query,
             "max": 10,
             "in": "title,description",
-            "sortby": "publishedAt",
+            "sortby": "relevance",   # OR publishedAt
             "country": country,
             "lang": glang,
             "apikey": api_key,
@@ -119,7 +125,7 @@ async def search(request: dict):
     seen = set()
 
     for country in COUNTRIES:
-        slang = TRANSLATOR_LANG[country]   # source lang for back-translation
+        slang = TRANSLATOR_LANG.get(country, "en")   # source lang for back-translation
         raw = data.get(country, {}).get("articles", [])
         kept = 0
         for article in raw:
@@ -138,7 +144,7 @@ async def search(request: dict):
                 "source": source.get("name", "Unknown"),
                 "url": article.get("url", ""),
                 "country": source.get("country", country),
-                "lang": GNEWS_LANG[country],
+                "lang": GNEWS_LANG.get(country, "en"),
             })
             kept += 1
         print(f"[FLOW]    [{country}] kept {kept} after dedup")
